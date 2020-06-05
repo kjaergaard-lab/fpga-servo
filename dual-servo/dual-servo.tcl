@@ -69,19 +69,19 @@ proc run_process {} {
    # process run "Map"
    # process run "Place & Route"
    #
-   set task "Implement Design"
-   if { ! [run_task $task] } {
-      puts "$myScript: $task run failed, check run output for details."
-      project close
-      return
-   }
-
-   set task "Generate Programming File"
-   if { ! [run_task $task] } {
-      puts "$myScript: $task run failed, check run output for details."
-      project close
-      return
-   }
+#   set task "Implement Design"
+#   if { ! [run_task $task] } {
+#      puts "$myScript: $task run failed, check run output for details."
+#      project close
+#      return
+#   }
+#
+#   set task "Generate Programming File"
+#   if { ! [run_task $task] } {
+#      puts "$myScript: $task run failed, check run output for details."
+#      project close
+#      return
+#   }
 
    puts "Run completed (successfully)."
    project close
@@ -411,7 +411,6 @@ proc set_process_props {} {
    project set "Maximum Compression" "false" -process "Map"
    project set "Generate Detailed MAP Report" "false" -process "Map"
    project set "Map Slice Logic into Unused Block RAMs" "false" -process "Map"
-   project set "Perform Timing-Driven Packing and Placement" "false"
    project set "Trim Unconnected Signals" "true" -process "Map"
    project set "Create I/O Pads from Ports" "false" -process "Translate"
    project set "Macro Search Path" "" -process "Translate"

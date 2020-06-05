@@ -69,19 +69,19 @@ proc run_process {} {
    # process run "Map"
    # process run "Place & Route"
    #
-   set task "Implement Design"
-   if { ! [run_task $task] } {
-      puts "$myScript: $task run failed, check run output for details."
-      project close
-      return
-   }
-
-   set task "Generate Programming File"
-   if { ! [run_task $task] } {
-      puts "$myScript: $task run failed, check run output for details."
-      project close
-      return
-   }
+#   set task "Implement Design"
+#   if { ! [run_task $task] } {
+#      puts "$myScript: $task run failed, check run output for details."
+#      project close
+#      return
+#   }
+#
+#   set task "Generate Programming File"
+#   if { ! [run_task $task] } {
+#      puts "$myScript: $task run failed, check run output for details."
+#      project close
+#      return
+#   }
 
    puts "Run completed (successfully)."
    project close
@@ -488,7 +488,7 @@ proc set_process_props {} {
    project set "MultiBoot: Insert IPROG CMD in the Bitfile" "Enable" -process "Generate Programming File"
    project set "Output File Name" "topmod" -process "Generate IBIS Model"
    project set "Timing Mode" "Performance Evaluation" -process "Place & Route"
-   project set "Create Binary Configuration File" "false" -process "Generate Programming File"
+   project set "Create Binary Configuration File" "true" -process "Generate Programming File"
    project set "Enable Debugging of Serial Mode BitStream" "false" -process "Generate Programming File"
    project set "Create Logic Allocation File" "false" -process "Generate Programming File"
    project set "Create Mask File" "false" -process "Generate Programming File"
