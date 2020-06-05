@@ -1,3 +1,13 @@
-!*.vhd
-!*.tcl
-!*.xco
+*-servo/*
+!*-servo/*.tcl
+!*-servo/sources/
+!*-servo/ipcore_dir/
+*-servo/ipcore_dir/*
+!*-servo/ipcore_dir/*.xco
+!*-servo/ipcore_dir/s6_lpddr*/
+*-servo/ipcore_dir/s6_lpddr*/*
+!*-servo/ipcore_dir/s6_lpddr*/user_design/
+*-servo/ipcore_dir/s6_lpddr*/user_design/*
+!*-servo/ipcore_dir/s6_lpddr*/user_design/rtl/
+
+
