@@ -77,7 +77,7 @@ constant MEM_DATA_WIDTH		:	integer	:=	8*NUM_MEM_BYTES;
 -- is 32 bits long, that gives 16e6 addresses, which corresponds to
 -- 24 bits of accessible memory
 --
-constant MEM_ADDR_USER_WIDTH	:	integer	:=	23;		--The width of the address field that the user can access when using variable loops
+constant MEM_ADDR_USER_WIDTH	:	integer	:=	21;		--The width of the address field that the user can access when using variable loops
 constant MEM_ADDR_TYPE_WIDTH	:	integer	:=	2;			--The width of the type field indicating what kind of data is present in the memory
 constant MEM_ADDR_ID_WIDTH		:	integer	:=	1;			--The width of the ID field indicating which controller's data to access
 --
