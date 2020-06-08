@@ -63,7 +63,7 @@ Refer to the Numato labs website for [driver installation instructions](https://
 
 ## Creating project files
 
-The git repository contains all the source files needed to create three different versions of the architecture - a single controller version, a dual controller version, and a quad controller version.  First, you will need to clone the git repository - navigate to the parent directory you want to use and run
+The git repository contains all the source files needed to create three different versions of the architecture - a single controller version, a dual controller version, and a quad controller version.  An additional version, called 'ip-trap-servo', is for internal use with our IP trap servo and uses a different DAC with additional switches.  First, you will need to clone the git repository - navigate to the parent directory you want to use and run
 
     git clone https://github.com/kjaergaard-lab/fpga-servo
 
