@@ -103,9 +103,9 @@ end component;
 
 component SampleGenerator
 	generic(	ID							:	unsigned(MEM_ADDR_ID_WIDTH-1 downto 0);		--Controller ID
-				SAMPLE_LOCATION		:	unsigned(1 downto 0);		--Location of samples
-				LOOP1_LOCATION			:	unsigned(1 downto 0);		--Location of first loop register
-				LOOP2_LOCATION			:	unsigned(1 downto 0)			--Location of second loop register
+				SAMPLE_LOCATION		:	unsigned(MEM_ADDR_TYPE_WIDTH-1 downto 0);		--Location of samples
+				LOOP1_LOCATION			:	unsigned(MEM_ADDR_TYPE_WIDTH-1 downto 0);		--Location of first loop register
+				LOOP2_LOCATION			:	unsigned(MEM_ADDR_TYPE_WIDTH-1 downto 0)		--Location of second loop register
 				);		
 	port (	clk				:	in	std_logic;	--Input clock
 				trigIn			:	in	std_logic;	--Input trigger
@@ -159,7 +159,7 @@ end component;
 
 component ADCMemRWControl
 	generic(	ID							:	unsigned(MEM_ADDR_ID_WIDTH-1 downto 0);						--Controller ID
-				DATA_LOCATION			:	unsigned(1 downto 0));						--Data location		
+				DATA_LOCATION				:	unsigned(MEM_ADDR_TYPE_WIDTH-1 downto 0));					--Data location		
 	port(	clk			:	in	std_logic;													--Clock
 			dataIn		:	in	mem_data;													--Input data to be written to memory
 			dataReady	:	in	std_logic;													--Input data is valid
@@ -757,7 +757,7 @@ SampleGen: SampleGenerator
 ProcessSerialData: process(clk) is
 begin
 	if rising_edge(clk) then
-		if dataReady = '1' and ((ENABLE_ID and cmdData(31 downto 30) = std_logic_vector(ID)) or (not ENABLE_ID)) then
+		if dataReady = '1' and ((ENABLE_ID and cmdData(31 downto 30) = std_logic_vector(resize(ID,2))) or (not ENABLE_ID)) then
 			if cmdData(28) = '0' then
 				--
 				-- Parse parameters
