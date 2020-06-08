@@ -166,7 +166,7 @@ end component;
 ------------------------------------------------------------
 -------------------   Memory Components  -------------------
 ------------------------------------------------------------
-component LPDDRControl_v2 is
+component LPDDRControl_2channel is
 port
   (
 	--
@@ -345,7 +345,7 @@ end generate Servo_Gen;
 ------------------------------------------------------------
 -------------------   Memory Components  -------------------
 ------------------------------------------------------------
-MemController: LPDDRControl_v2
+MemController: LPDDRControl_2channel
 	port map(
 		mcb3_dram_dq => mcb3_dram_dq,
 		mcb3_dram_a => mcb3_dram_a,
