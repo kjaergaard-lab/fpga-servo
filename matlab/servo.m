@@ -8,6 +8,7 @@ classdef servo < handle
         ser                     %The serial object
         
         %% Properties related to physical changes on boards
+        dacType                 %Type of DAC - either 'AD5791' or 'MAX5719'
         dacRef                  %DAC reference voltage corresponding to maximum DAC code
         
         %% Global settings
@@ -76,10 +77,12 @@ classdef servo < handle
         BUFFER_SIZE = 2^24;     %Serial buffer size
         
         %% DAC constants
-        DAC_REF = 10;               %Default DAC reference [V]
-        DAC_NUM_BITS = 20;          %Number of bits for DAC data
-        DAC_MODE_UNI = 'unipolar';  %Indicates DAC is in unipolar mode
-        DAC_MODE_BI = 'bipolar';    %Indicates DAC is in bipolar mode
+        DAC_REF = 10;                   %Default DAC reference [V]
+        DAC_NUM_BITS = 20;              %Number of bits for DAC data
+        DAC_MODE_UNI = 'unipolar';      %Indicates DAC is in unipolar mode
+        DAC_MODE_BI = 'bipolar';        %Indicates DAC is in bipolar mode
+        DAC_TYPE_AD5791 = 'AD5791';     %Indicates DAC is an AD5719
+        DAC_TYPE_MAX5719 = 'MAX5719';   %Indicates DAC is a MAX5719
         
         %% ADC constants
         ADC_REF = 2.5;          %ADC reference voltage [V]
@@ -105,14 +108,26 @@ classdef servo < handle
     
     methods
         %% General property functions
-        function sv=servo(ID)
+        function sv=servo(ID,dacType)
             %SERVO Creates a servo object
             %   sv = servo(ID) Initializes a servo object with default 
-            %   parameters that is addressed using ID
+            %   parameters that is addressed using ID.  DAC type defaults
+            %   to AD5791
+            %   
+            %   sv = servo(ID,dacType) works as above but sets the DAC type
+            %   to dacType, either 'AD5791' or 'MAX5719'
             
             sv.defineProperties;
             sv.setID(ID);
             
+            if nargin<2 || strcmpi(dacType,servo.DAC_TYPE_AD5791)
+                sv.dacType = servo.DAC_TYPE_AD5791;
+            elseif strcmpi(dacType,servo.DAC_TYPE_MAX5719)
+                sv.dacType = servo.DAC_TYPE_MAX5719;
+            else
+                error('Unrecognized DAC type.  Must be either %s or %s',servo.DAC_TYPE_AD5791,servo.DAC_TYPE_MAX5719);
+            end
+                
             sv.dacMode.set(servo.DAC_MODE_BI);
             sv.dacRef = servo.DAC_REF;
             sv.retryOnWarning = false;
@@ -286,10 +301,17 @@ classdef servo < handle
             sv.loopData2.setBits(bits,sv.ID);
         end
         
-        function coerceValues(sv)    %#ok
+        function coerceValues(sv)
             %COERCEVALUES Coerces property values to be in acceptable
             %ranges
-            %   For the servo class, no coercion is needed
+            %
+            %   Coercion only occurs when dacType is AD591
+            
+            if strcmpi(sv.dacType,sv.DAC_TYPE_AD5791)
+                sv.syncDelay.set(0)
+                sv.useExtSwitch.set(false);
+            end
+            
         end
         
         %% Serial port functions
@@ -343,18 +365,34 @@ classdef servo < handle
             end
         end
         
+        function set.dacType(sv,v)
+            %SET.DACTYPE Sets the type of the DAC to either AD5791 or
+            %MAX5719
+            if strcmpi(v,servo.DAC_TYPE_AD5791)
+                sv.dacType = servo.DAC_TYPE_AD5791;
+            elseif strcmpi(v,servo.DAC_TYPE_MAX5719)
+                sv.dacType = servo.DAC_TYPE_MAX5719;
+            else
+                error('Only DAC types allowed are %s or %s',servo.DAC_TYPE_AD5791,servo.DAC_TYPE_MAX5719);
+            end
+        end
+        
         function dacSetup(sv)
             %DACSETUP Sets up the AD5791 to use offset-binary encoding
-            c = bin2dec('001000000000000000010010');
-            
-            sv.auxCmd.setBits([27,24],0).setReg('reg1','00');
-            sv.auxCmd.dataType = servoCmd.TYPE_UINT;
-            sv.auxCmd.set(c);
-            sv.auxCmd.write(sv.ser);
-            
-            sv.auxCmd.dataType = servoCmd.TYPE_CMD;
-            sv.auxCmd.setReg('reg1','01');
-            sv.auxCmd.write(sv.ser);
+            %
+            %   If dacType is MAX5719, it only writes 0 V to the output
+            if strcmpi(sv.dacType,servo.DAC_TYPE_AD5791)
+                c = bin2dec('001000000000000000010010');
+
+                sv.auxCmd.setBits([27,24],0).setReg('reg1','00');
+                sv.auxCmd.dataType = servoCmd.TYPE_UINT;
+                sv.auxCmd.set(c);
+                sv.auxCmd.write(sv.ser);
+
+                sv.auxCmd.dataType = servoCmd.TYPE_CMD;
+                sv.auxCmd.setReg('reg1','01');
+                sv.auxCmd.write(sv.ser);
+            end
             
             %Finish set-up by writing a zero value
             sv.dacWrite(0);
@@ -366,7 +404,11 @@ classdef servo < handle
             %   a DAC code that is then written to the device
             sv.open;
             c = sv.dacConvert(V,sv.dacMode.get,sv.dacRef);
-            c = uint32(c)+bitshift(1,20);
+            if strcmpi(sv.dacType,servo.DAC_TYPE_AD5791)
+                c = uint32(c)+bitshift(1,20);
+            elseif strcmpi(sv.dacType,servo.DAC_TYPE_MAX5719)
+                c = bitshift(uint32(c),4,'uint32');
+            end
             
             sv.auxCmd.setBits([27,24],0).setReg('reg1','00');
             sv.auxCmd.dataType = servoCmd.TYPE_UINT;
@@ -532,6 +574,9 @@ classdef servo < handle
             if nargin==1 || strcmpi(cnv,sv.TRANSMIT_ADC)
                 data = sv.adcConvert(data);
             elseif strcmpi(cnv,sv.TRANSMIT_DAC)
+                if strcmpi(sv.dacType,servo.DAC_TYPE_MAX5719)
+                    data = bitshift(data,-4);
+                end
                 data = sv.dacConvert(data,sv.dacMode.get,sv.dacRef,'volt');
             end
             
@@ -578,7 +623,11 @@ classdef servo < handle
             if nargin==1 || strcmpi(cnv,sv.TRANSMIT_ADC)
                 data = sv.adcConvert(data);
             elseif strcmpi(cnv,sv.TRANSMIT_DAC)
-                data = data-2^20;
+                if strcmpi(sv.dacType,servo.DAC_TYPE_AD5791)
+                    data = data-2^20;
+                elseif strcmpi(sv.dacType,servo.DAC_TYPE_MAX5719)
+                    data = bitshift(data,-4);
+                end
                 data = sv.dacConvert(data,sv.dacMode.get,sv.dacRef,'volt');
             end
             if sv.transmitType.get == 2

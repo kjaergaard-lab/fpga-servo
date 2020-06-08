@@ -11,4 +11,4 @@
 *-servo/ipcore_dir/s6_lpddr*/user_design/*
 !*-servo/ipcore_dir/s6_lpddr*/user_design/rtl/
 
-
+*.asv

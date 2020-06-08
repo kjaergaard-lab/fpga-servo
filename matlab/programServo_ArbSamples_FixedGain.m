@@ -14,7 +14,7 @@
 sv=servo(0);                            %Create the servo object
 sv.comPort = 'com4';                    %Set the com port to the appropriate value for your PC
 %
-% dacRef and dacMode have to be set at the start since othre properties
+% dacRef and dacMode have to be set at the start since other properties
 % depend on them correctly being set
 %
 sv.dacRef = 10;                         %Set the DAC ref voltage to 10 V.
