@@ -17,7 +17,7 @@ This project was built using Xilinx FPGAs and Xilinx tools.  Experienced users c
 
 ## Using the servos as-is
 
-The binary configuration files built by ISE are included in the relevant project directories.  You will need to install the appropriate drivers through the Numato website, and you should use the 'saturnflashconfig.exe' program for uploading the configuration files if using a Windows computer.
+The binary configuration files built by ISE are included in the relevant project directories.  You will need to install the appropriate drivers through the Numato website, and you should use the 'saturnflashconfig.exe' program for uploading the configuration files if using a Windows computer.  Open 'saturnflashconfig.exe', load the appropriate binary file, and click program flash.  Sometimes the programming fails, but just re-run it and it nearly always works the second time.
 
 If you want to modify the FPGA configurations, you will need follow the instructions below for setting up ISE 14.7.
 
